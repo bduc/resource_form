@@ -2,9 +2,10 @@ module ResourceForm
   class BaseResource
     VALID_FIELD_OPTIONS = %i[
       as label hint placeholder prepend append unit
-      collection class_name polymorphic values include_blank
+      collection class_name polymorphic values include_blank prompt
+      label_method value_method
       partial required readonly disabled width align format
-      url rows step
+      url rows step accept capture multiple
       show index filter
     ].freeze
 

@@ -22,6 +22,11 @@
         option_tags,
         select_options,
         class: "select select-sm w-full #{'select-error' if error}",
+        data: {
+          controller: "tom-select",
+          tom_select_url_value: options[:url] || spec[:url],
+          tom_select_placeholder_value: options[:placeholder] || spec[:placeholder]
+        },
         required: spec[:required],
         disabled: spec[:disabled] %>
 <% end %>
