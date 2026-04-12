@@ -1,0 +1,19 @@
+<%= render "resource_form/daisyui/form/wrapper", f: f, name: name, spec: spec, options: options, error: error do %>
+  <%
+    selected_objects = Array(f.object.send(name))
+    preselected_options = selected_objects.map { |o| [o.respond_to?(:name) ? o.name : o.to_s, o.id] }
+    url = options[:url] || spec[:url]
+  %>
+  <%= f.select "#{name.to_s.singularize}_ids",
+        options_for_select(preselected_options, selected_objects.map(&:id)),
+        {},
+        multiple: true,
+        class: "select select-sm w-full #{'select-error' if error}",
+        data: {
+          controller: "tom-select",
+          tom_select_url_value: url,
+          tom_select_multiple_value: "true",
+          tom_select_placeholder_value: options[:placeholder] || spec[:placeholder]
+        },
+        disabled: spec[:disabled] %>
+<% end %>

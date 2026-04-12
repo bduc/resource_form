@@ -1,0 +1,14 @@
+<div class="mb-2">
+  <label class="flex items-center gap-2 text-sm cursor-pointer">
+    <%= f.check_box name,
+          class: "checkbox checkbox-sm checkbox-primary",
+          disabled: spec[:disabled] %>
+    <span><%= options[:label] || spec[:label] || f.object.class.human_attribute_name(name) %></span>
+  </label>
+  <% if error %>
+    <p class="label text-error text-xs"><%= error %></p>
+  <% end %>
+  <% if spec[:hint] %>
+    <p class="label text-base-content/60 text-xs"><%= spec[:hint] %></p>
+  <% end %>
+</div>

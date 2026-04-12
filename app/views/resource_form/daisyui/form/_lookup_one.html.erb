@@ -1,0 +1,28 @@
+<%= render "resource_form/daisyui/form/wrapper", f: f, name: name, spec: spec, options: options, error: error do %>
+  <%
+    # Associations: attribute is the association name, FK is :#{name}_id
+    association = f.object.class.reflect_on_association(name)
+    fk_name = association ? association.foreign_key.to_sym : name
+    selected_id = f.object.send(fk_name)
+    selected_object = association ? f.object.send(name) : nil
+
+    selected_label = if selected_object.respond_to?(:name) && selected_object.name.present?
+      selected_object.name
+    elsif selected_object
+      selected_object.to_s
+    end
+
+    preselected_options = selected_object ? [[selected_label, selected_id]] : []
+    url = options[:url] || spec[:url]
+  %>
+  <%= f.select fk_name,
+        options_for_select(preselected_options, selected_id),
+        { include_blank: options.fetch(:include_blank, true) },
+        class: "select select-sm w-full #{'select-error' if error}",
+        data: {
+          controller: "tom-select",
+          tom_select_url_value: url,
+          tom_select_placeholder_value: options[:placeholder] || spec[:placeholder]
+        },
+        disabled: spec[:disabled] %>
+<% end %>

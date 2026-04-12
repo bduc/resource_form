@@ -1,0 +1,9 @@
+<%= render "resource_form/daisyui/form/wrapper", f: f, name: name, spec: spec, options: options, error: error do %>
+  <% collection = options[:collection] || spec[:collection] || spec[:values] || [] %>
+  <%= f.select name,
+        collection,
+        { include_blank: options.fetch(:include_blank, spec.fetch(:include_blank, true)) },
+        class: "select select-sm w-full #{'select-error' if error}",
+        required: spec[:required],
+        disabled: spec[:disabled] %>
+<% end %>

@@ -1,0 +1,26 @@
+<fieldset class="fieldset mb-2">
+  <% if options[:label] != false %>
+    <legend class="fieldset-legend">
+      <%= options[:label] || spec[:label] || f.object.class.human_attribute_name(name) %>
+    </legend>
+  <% end %>
+  <% if spec[:prepend] || spec[:append] %>
+    <div class="join w-full">
+      <% if spec[:prepend] %>
+        <span class="join-item btn btn-sm btn-ghost pointer-events-none"><%= spec[:prepend] %></span>
+      <% end %>
+      <%= yield %>
+      <% if spec[:append] %>
+        <span class="join-item btn btn-sm btn-ghost pointer-events-none"><%= spec[:append] %></span>
+      <% end %>
+    </div>
+  <% else %>
+    <%= yield %>
+  <% end %>
+  <% if error %>
+    <p class="label text-error text-xs"><%= error %></p>
+  <% end %>
+  <% if spec[:hint] %>
+    <p class="label text-base-content/60 text-xs"><%= spec[:hint] %></p>
+  <% end %>
+</fieldset>
