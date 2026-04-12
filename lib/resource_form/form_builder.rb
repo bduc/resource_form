@@ -1,8 +1,9 @@
 module ResourceForm
   class FormBuilder < ActionView::Helpers::FormBuilder
     def field(name, options = {})
-      spec = resource_class.fields[name.to_sym]
-      raise ArgumentError, "Unknown field :#{name} for #{resource_class.model_class_name}" unless spec
+      # Unknown fields get a default spec. This lets f.field :password work
+      # on attributes that aren't DB columns (virtual attributes, etc.).
+      spec = resource_class.fields[name.to_sym] || infer_spec(name)
 
       merged = spec.merge(options.deep_symbolize_keys)
       kind = merged[:as] || :text
@@ -27,6 +28,19 @@ module ResourceForm
     end
 
     private
+
+    # Infer a reasonable default for attributes not declared in the resource.
+    def infer_spec(name)
+      case name.to_s
+      when /password/      then { as: :password }
+      when /_at\z/         then { as: :datetime }
+      when /_on\z/, /\Adate_/ then { as: :date }
+      when /email/         then { as: :email }
+      when /phone|mobile|fax|tel/ then { as: :tel }
+      else
+        {}
+      end
+    end
 
     def error_for(name)
       return nil unless object.respond_to?(:errors)
