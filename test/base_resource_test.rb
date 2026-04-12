@@ -12,9 +12,9 @@ class BaseResourceTest < ActiveSupport::TestCase
     assert_equal "Province", resource.fields[:province][:class_name]
   end
 
-  test "removes foreign key column when belongs_to exists" do
+  test "keeps FK column alongside belongs_to association" do
     resource = ResourceForm::BaseResource.for(Federation)
-    assert_nil resource.fields[:province_id]
+    refute_nil resource.fields[:province_id]
   end
 
   test "auto-detects date columns as date fields" do
