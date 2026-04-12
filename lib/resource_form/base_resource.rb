@@ -79,13 +79,13 @@ module ResourceForm
         ar_model.reflect_on_all_associations.each do |assoc|
           case assoc.macro
           when :belongs_to
+            # Keep both :foo_id (column-derived) and :foo (association) available.
+            # :foo renders as lookup_one; :foo_id is available for plain select.
             @fields[assoc.name] = {
               as: :lookup_one,
               class_name: assoc.class_name,
               polymorphic: !!assoc.polymorphic?
             }
-            @fields.delete(assoc.foreign_key.to_sym)
-            @fields.delete(assoc.foreign_type.to_sym) if assoc.polymorphic?
           when :has_many
             @fields[assoc.name] = {
               as: :lookup_many,
