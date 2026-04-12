@@ -9,6 +9,8 @@ Auto-detecting Rails form builder with partial templates per CSS framework.
 - **Implicit resource classes**: No empty boilerplate — declare a `*Resource` class only when overriding
 - **Easy custom fields**: Drop a partial into `app/views/resource_form/<theme>/form/_my_field.html.erb`
 - **Per-field decorations**: Prepend, append, hints, errors handled by a single wrapper partial
+- **Error consumption**: FK fields automatically consume errors from their association name; `consume_errors:` option handles other cases
+- **Unreported errors alert**: `f.unreported_errors` displays errors on attributes not rendered as fields (hidden_field errors no longer silently fail)
 
 ## Usage
 
@@ -73,6 +75,37 @@ Rails view resolution lets you override gem partials by providing a file at the 
 app/views/resource_form/daisyui/form/_select.html.erb           # overrides gem default
 app/views/resource_form/daisyui/form/members/_select.html.erb   # overrides only for members
 ```
+
+## Error handling
+
+Each field's wrapper displays inline errors from `object.errors[name]`. A few behaviors make this more useful than plain Rails:
+
+**Automatic error consumption.** A FK field like `:province_id` also consumes errors on the `:province` association. A `:password` field consumes `:password_confirmation` errors. So a validation like `validates :province, presence: true` surfaces on the `province_id` select without needing any config.
+
+**Explicit `consume_errors:`** when a field is responsible for errors on other attribute names:
+
+```erb
+<%= f.field :photo, consume_errors: [:photo_content_type, :photo_size] %>
+```
+
+Or declare it on the resource:
+
+```ruby
+field :photo, as: :file, consume_errors: [:photo_content_type, :photo_size]
+```
+
+**Unreported-errors alert.** Validation errors on attributes that no `f.field` rendered would otherwise silently fail (the form re-renders with no visible error). Place `f.unreported_errors` at the top of the form and any such errors appear in an alert:
+
+```erb
+<%= resource_form_with(model: @member) do |f| %>
+  <%= f.unreported_errors %>   <%# Shows errors on hidden fields or undisplayed attributes %>
+  <%= f.field :name %>
+  <%= f.field :email %>
+  <%= f.submit %>
+<% end %>
+```
+
+The helper is resolved after the form body renders, so it works even at the top of the form — the marker is swapped for the final HTML once all `f.field` calls have registered which attributes they "reported".
 
 ## Field spec options
 
