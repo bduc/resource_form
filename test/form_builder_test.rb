@@ -27,7 +27,9 @@ class FormBuilderTest < ActiveSupport::TestCase
     consumed = builder.send(:error_attribute_names, :name, consume_errors: [:province])
     assert_includes consumed, :name
     assert_includes consumed, :province
-    assert_equal "B and A", builder.send(:error_for, consumed)
+    # to_sentence is locale-dependent ("and" in :en, "en" in :nl), and the host
+    # app picks the locale — so assert against it rather than hardcoding English.
+    assert_equal [ "B", "A" ].to_sentence, builder.send(:error_for, consumed)
   end
 
   test "password field defaults to consuming password_confirmation errors" do

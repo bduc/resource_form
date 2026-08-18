@@ -6,11 +6,8 @@
     selected_id = f.object.send(fk_name)
     selected_object = association ? f.object.send(name) : nil
 
-    selected_label = if selected_object.respond_to?(:name) && selected_object.name.present?
-      selected_object.name
-    elsif selected_object
-      selected_object.to_s
-    end
+    label_method = options[:label_method] || spec[:label_method]
+    selected_label = ResourceForm.lookup_label(selected_object, label_method: label_method)
 
     preselected_options = selected_object ? [[selected_label, selected_id]] : []
     url = options[:url] || spec[:url]

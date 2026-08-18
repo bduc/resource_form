@@ -11,6 +11,7 @@ Auto-detecting Rails form builder with partial templates per CSS framework.
 - **Per-field decorations**: Prepend, append, hints, errors handled by a single wrapper partial
 - **Error consumption**: FK fields automatically consume errors from their association name; `consume_errors:` option handles other cases
 - **Unreported errors alert**: `f.unreported_errors` displays errors on attributes not rendered as fields (hidden_field errors no longer silently fail)
+- **Lookup labels**: a selected record labels itself via a `lookup_label` convention, so the preselected option matches what the AJAX endpoint returned
 
 ## Usage
 
@@ -59,6 +60,7 @@ The partial receives `f`, `name`, `spec`, `options`, and `error` as locals. Call
 ResourceForm.configure do |c|
   c.theme = :daisyui             # partial subfolder to use
   c.resource_class_suffix = "Resource"
+  c.lookup_label_methods = %i[lookup_label display_name full_name name]
 end
 ```
 
@@ -117,9 +119,38 @@ The helper is resolved after the form body renders, so it works even at the top 
 - `collection:` / `values:` — for select fields
 - `class_name:` — for lookup_one / lookup_many
 - `url:` — tom-select AJAX endpoint for lookups
+- `label_method:` — reader used to label the option (select) or the already-selected record (lookups)
 - `required:`, `readonly:`, `disabled:`
 - `partial:` — explicitly pick a custom partial name
 - `show:`, `index:`, `filter:` — reserved for future non-form view modes (ignored by FormBuilder)
+
+## Labelling selected lookup records
+
+A `lookup_one` / `lookup_many` field renders its already-selected record as a preselected
+`<option>`, so it needs a label without hitting the AJAX endpoint. The label is resolved as:
+
+1. the field's `label_method:`, if it returns a present value
+2. the first present reader in `config.lookup_label_methods` — by default
+   `:lookup_label`, `:display_name`, `:full_name`, `:name`
+3. `to_s`
+
+Defining `lookup_label` on a model is the zero-config route, and lets the model be the single
+source of truth for its label — have the AJAX endpoint return the same string so the option text
+does not change between picking a record and re-opening the form:
+
+```ruby
+class Member < ApplicationRecord
+  def lookup_label
+    "#{last_name} #{first_name} (##{id})"
+  end
+end
+```
+
+Override the chain globally with:
+
+```ruby
+ResourceForm.configure { |config| config.lookup_label_methods = %i[caption name] }
+```
 
 ## Multi-view (future)
 

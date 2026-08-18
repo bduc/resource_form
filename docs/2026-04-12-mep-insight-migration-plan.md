@@ -4,7 +4,7 @@
 
 **Scope:** Migrate 53 form partials across `insight_core` engine + `insight_lambrechts` and `mep_tereos` apps from `BootstrapForm + ResourceFormBuilder` to the `resource_form` engine with a new `coreui` theme.
 
-**Path:** Gemfile will reference `../../resource_form` from `/home/bdu/mep_insight/mep_insight`.
+**Path:** Gemfile will reference `../../resource_form` from `/home/bdu/Develop/mep_insight/mep_insight`.
 
 ---
 
@@ -25,7 +25,7 @@ mep_insight's forms are driven by a `BaseResource` + `ResourceFormBuilder` patte
 
 ## Phase 1 — Engine enhancements (prerequisite, 2 days)
 
-Do these before touching mep_insight. Work happens in `/home/bdu/resource_form`. Tests run against mira_rails host.
+Do these before touching mep_insight. Work happens in `/home/bdu/Develop/resource_form`. Tests run against the mira_rails host (`test/test_helper.rb` resolves it as a sibling checkout; override with `RESOURCE_FORM_HOST_APP`).
 
 ### 1.1 `attr_json` auto-detection in `BaseResource`
 
@@ -60,7 +60,9 @@ When `spec[:component]` is set, FormBuilder renders the ViewComponent (`@templat
 
 ### 1.6 Helper method for autocomplete item shape
 
-Add a module (or instance method on BaseResource) that can produce `{ value:, text:, description:, icon:, optgroup: }` hashes from objects responding to `to_autocomplete_item` (used by mep_insight models). Fall back to `{ value: obj.id, text: obj.to_s }` when the method isn't available — so vanilla Rails models still work.
+Add a module (or instance method on BaseResource) that can produce `{ value:, text:, description:, icon:, optgroup: }` hashes from objects responding to `to_autocomplete_item` (used by mep_insight models). Fall back to `{ value: obj.id, text: ResourceForm.lookup_label(obj) }` when the method isn't available — so vanilla Rails models still work, and the AJAX result matches the label the lookup partials render for an already-selected record.
+
+**Note:** `ResourceForm.lookup_label` already exists (`lookup_label` → `display_name` → `full_name` → `name` → `to_s`, configurable via `config.lookup_label_methods`). mep_insight's `to_autocomplete_item` contract layers on top of it rather than replacing it.
 
 ---
 

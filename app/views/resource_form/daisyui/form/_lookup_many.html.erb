@@ -1,7 +1,8 @@
 <%= render "resource_form/daisyui/form/wrapper", f: f, name: name, spec: spec, options: options, error: error do %>
   <%
     selected_objects = Array(f.object.send(name))
-    preselected_options = selected_objects.map { |o| [o.respond_to?(:name) ? o.name : o.to_s, o.id] }
+    label_method = options[:label_method] || spec[:label_method]
+    preselected_options = selected_objects.map { |o| [ResourceForm.lookup_label(o, label_method: label_method), o.id] }
     url = options[:url] || spec[:url]
   %>
   <%= f.select "#{name.to_s.singularize}_ids",
