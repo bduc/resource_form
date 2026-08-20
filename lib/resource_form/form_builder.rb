@@ -5,7 +5,13 @@ module ResourceForm
     UNREPORTED_ERRORS_MARKER = "<!--RESOURCE_FORM_UNREPORTED_ERRORS-->".freeze
 
     def field(name, options = {})
-      spec = resource_class.fields[name.to_sym] || {}
+      # resource_class.fields only has entries for real columns and
+      # associations (ResourceCore::Detection.fields_for). A name that is
+      # neither — a virtual attribute like Devise's `password` — falls
+      # through to the detector chain with no column, so name-pattern
+      # inference (password/email/date/datetime/tel) still applies instead
+      # of silently defaulting to :text.
+      spec = resource_class.fields[name.to_sym] || { as: ResourceCore::Detection.field_type_for(name, nil) }
 
       merged = spec.merge(options.deep_symbolize_keys)
       kind = merged[:as] || :text

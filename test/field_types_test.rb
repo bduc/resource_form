@@ -36,6 +36,25 @@ class FieldTypesTest < ActiveSupport::TestCase
     assert_equal :tel,      ResourceCore::Detection.field_type_for(:mobile, column)
   end
 
+  test "detector precedence: earlier-registered-in-code rules win name collisions" do
+    # Each name below matches two of the five patterns at once, so unlike the
+    # five single-match names above, these actually pin the *order* the
+    # detectors are tried in (register_detector unshifts, so the last
+    # ResourceCore.detect call in field_types.rb is tried first).
+
+    # "email_at" contains "email" (the :email rule) AND ends in "_at" (the
+    # :datetime rule). :datetime is registered after :email, so it is tried
+    # first and wins — reproducing the original case statement's top-to-bottom
+    # order (password, _at, _on/date_, email, tel).
+    assert_equal :datetime, ResourceCore::Detection.field_type_for(:email_at, nil)
+
+    # "date_synced_at" starts with "date_" (the :date rule) AND ends in "_at"
+    # (the :datetime rule) — the date/datetime pair the task calls out as easy
+    # to get backwards. :datetime is registered after :date, so it wins here
+    # too.
+    assert_equal :datetime, ResourceCore::Detection.field_type_for(:date_synced_at, nil)
+  end
+
   test "FK and password error rules are registered" do
     assert_equal %i[author_id author], ResourceCore.consumed_error_names(:author_id, {})
     assert_equal %i[password password_confirmation], ResourceCore.consumed_error_names(:password, {})

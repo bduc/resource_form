@@ -6,6 +6,13 @@ class FormBuilderTest < ActiveSupport::TestCase
     ResourceForm::FormBuilder.new(object.class.name.underscore, object, view, {})
   end
 
+  # Real view paths (including the engine's own app/views) so the partial
+  # actually renders, unlike make_builder's empty lookup context.
+  def make_rendering_builder(object)
+    view = ActionView::Base.with_empty_template_cache.with_view_paths(ApplicationController.view_paths)
+    ResourceForm::FormBuilder.new(object.class.name.underscore, object, view, {})
+  end
+
   test "error_for aggregates errors across a field's consumed attribute names" do
     book = Book.new
     book.errors.add(:author, "must exist")
@@ -45,6 +52,16 @@ class FormBuilderTest < ActiveSupport::TestCase
     book = Book.new
     builder = make_builder(book)
     assert_equal Set.new, builder.send(:reported_attrs)
+  end
+
+  test "field infers a type by name pattern for a virtual attribute that is not a column" do
+    author = Author.new # Author#password is attr_accessor, not a DB column
+    builder = make_rendering_builder(author)
+
+    html = builder.field(:password)
+
+    assert_match(/type="password"/, html)
+    assert_no_match(/type="text"/, html)
   end
 
   test "unreported_errors returns a placeholder marker" do
