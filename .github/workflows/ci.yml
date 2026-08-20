@@ -23,7 +23,7 @@ jobs:
       RAILS_ENV: test
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/resource_form_test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           path: resource_form
       # actions/checkout requires `path:` to resolve under $GITHUB_WORKSPACE,
@@ -31,7 +31,7 @@ jobs:
       # subdirectory (../resource_core is one level above and gets rejected)
       # rather than the sibling-checkout layout the Gemfile's `path:` implies
       # locally.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: bduc/resource_core
           path: resource_core
