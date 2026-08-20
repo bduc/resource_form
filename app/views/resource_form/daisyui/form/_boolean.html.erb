@@ -3,7 +3,7 @@
     <%= f.check_box name,
           class: "checkbox checkbox-sm checkbox-primary",
           disabled: spec[:disabled] %>
-    <span><%= options[:label] || spec[:label] || f.object.class.human_attribute_name(name) %></span>
+    <span><%= spec[:label] || f.object.class.human_attribute_name(name) %></span>
   </label>
   <% if error %>
     <p class="label text-error text-xs"><%= error %></p>

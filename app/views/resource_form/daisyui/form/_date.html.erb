@@ -1,7 +1,5 @@
-<%= render "resource_form/daisyui/form/wrapper", f: f, name: name, spec: spec, options: options, error: error do %>
-  <%= f.date_field name,
-        class: "input input-sm w-full #{'input-error' if error}",
-        required: spec[:required],
-        readonly: spec[:readonly],
-        disabled: spec[:disabled] %>
-<% end %>
+<%= f.date_field name,
+      class: "input input-sm w-full #{'input-error' if error}",
+      required: spec[:required],
+      readonly: spec[:readonly],
+      disabled: spec[:disabled] %>

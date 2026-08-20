@@ -14,25 +14,33 @@ module ResourceForm
       spec = resource_class.fields[name.to_sym] || { as: ResourceCore::Detection.field_type_for(name, nil) }
 
       merged = spec.merge(options.deep_symbolize_keys)
-      kind = merged[:as] || :text
+      kind = (merged[:as] || :text).to_sym
+
+      type = ResourceCore.field_type(kind)
+      unless type
+        raise ArgumentError,
+              "unknown field type #{kind.inspect} on #{name.inspect}. " \
+              "Registered: #{ResourceCore.field_types(renderer: :form).keys.sort.inspect}"
+      end
+
+      # Type defaults sit under everything: the resource's spec and the call
+      # site both override them.
+      merged = type.defaults.merge(merged)
 
       # Track which attribute names this field consumes errors for.
       consumed = ResourceCore.consumed_error_names(name, merged)
       consumed.each { |n| reported_attrs << n.to_sym }
+      error = error_for(consumed)
 
-      partial = merged[:partial] || kind.to_s
-      theme = ResourceForm.config.theme
+      locals = { f: self, name: name.to_sym, spec: merged, error: error }
+      body = @template.render(partial: partial_path(merged[:partial] || type.partial), locals: locals)
 
-      @template.render(
-        partial: "resource_form/#{theme}/form/#{partial}",
-        locals: {
-          f: self,
-          name: name.to_sym,
-          spec: merged,
-          options: options,
-          error: error_for(consumed)
-        }
-      )
+      return body unless type.wrapper?
+
+      # `layout:`, not `partial:` — a partial rendered with `partial:` ignores
+      # the block, so `<%= yield %>` in the wrapper would emit nothing and the
+      # field would silently vanish inside its own fieldset.
+      @template.render(layout: partial_path("wrapper"), locals: locals) { body }
     end
 
     # Render a placeholder. `resource_form_with` helper replaces the marker
@@ -76,6 +84,26 @@ module ResourceForm
       return nil unless object.respond_to?(:errors)
       messages = Array(names).flat_map { |n| object.errors[n] }.compact
       messages.any? ? messages.to_sentence : nil
+    end
+
+    # Walks the theme chain and returns the first path that exists, so a theme
+    # only has to supply the partials it actually changes.
+    def partial_path(partial)
+      chain = ResourceCore.theme_chain(ResourceForm.config.theme)
+
+      # `exists?`'s `partial: true` already prepends the underscore itself
+      # (see ActionView::TemplatePath.virtual) — passing "_#{partial}" here
+      # would look for a double-underscored file and never find it.
+      found = chain.find do |theme|
+        @template.lookup_context.exists?(partial.to_s, [ "resource_form/#{theme}/form" ], true)
+      end
+
+      unless found
+        raise ArgumentError,
+              "no partial #{partial.inspect} in theme chain #{chain.inspect}"
+      end
+
+      "resource_form/#{found}/form/#{partial}"
     end
   end
 end

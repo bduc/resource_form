@@ -8,8 +8,18 @@ class FormBuilderTest < ActiveSupport::TestCase
 
   # Real view paths (including the engine's own app/views) so the partial
   # actually renders, unlike make_builder's empty lookup context.
+  #
+  # Built from ApplicationController's own view context class rather than
+  # `ActionView::Base.with_empty_template_cache` directly: that call mints a
+  # brand new, isolated `compiled_method_container` every time, distinct from
+  # the one every controller (and ActionView::TestCase, which other test
+  # files use to render fields for real) shares process-wide. Once any
+  # partial gets compiled onto one container, `Template#compile!` never
+  # recompiles it onto another — so a second, differently-built view hitting
+  # the same cached template raises a bare NoMethodError instead of
+  # rendering it.
   def make_rendering_builder(object)
-    view = ActionView::Base.with_empty_template_cache.with_view_paths(ApplicationController.view_paths)
+    view = ApplicationController.view_context_class.with_view_paths(ApplicationController.view_paths)
     ResourceForm::FormBuilder.new(object.class.name.underscore, object, view, {})
   end
 

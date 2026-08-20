@@ -1,27 +1,25 @@
-<%= render "resource_form/daisyui/form/wrapper", f: f, name: name, spec: spec, options: options, error: error do %>
-  <%
-    collection = options[:collection] || spec[:collection] || spec[:values] || []
-    label_method = options[:label_method] || spec[:label_method]
-    value_method = options[:value_method] || spec[:value_method]
-    selected_value = f.object.respond_to?(name) ? f.object.send(name) : nil
+<%
+  collection = spec[:collection] || spec[:values] || []
+  label_method = spec[:label_method]
+  value_method = spec[:value_method]
+  selected_value = f.object.respond_to?(name) ? f.object.send(name) : nil
 
-    select_options = {}
-    if options.key?(:prompt) || spec.key?(:prompt)
-      select_options[:prompt] = options[:prompt] || spec[:prompt]
-    else
-      select_options[:include_blank] = options.fetch(:include_blank, spec.fetch(:include_blank, true))
-    end
+  select_options = {}
+  if spec.key?(:prompt)
+    select_options[:prompt] = spec[:prompt]
+  else
+    select_options[:include_blank] = spec.fetch(:include_blank, true)
+  end
 
-    option_tags = if label_method && value_method
-      options_from_collection_for_select(collection, value_method, label_method, selected_value)
-    else
-      options_for_select(collection, selected_value)
-    end
-  %>
-  <%= f.select name,
-        option_tags,
-        select_options,
-        class: "select select-sm w-full #{'select-error' if error}",
-        required: spec[:required],
-        disabled: spec[:disabled] %>
-<% end %>
+  option_tags = if label_method && value_method
+    options_from_collection_for_select(collection, value_method, label_method, selected_value)
+  else
+    options_for_select(collection, selected_value)
+  end
+%>
+<%= f.select name,
+      option_tags,
+      select_options,
+      class: "select select-sm w-full #{'select-error' if error}",
+      required: spec[:required],
+      disabled: spec[:disabled] %>

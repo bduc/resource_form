@@ -1,11 +1,9 @@
-<%= render "resource_form/daisyui/form/wrapper", f: f, name: name, spec: spec, options: options, error: error do %>
-  <%
-    input_html = { class: "file-input file-input-sm w-full #{'file-input-error' if error}" }
-    input_html[:accept] = options[:accept] || spec[:accept] if options[:accept] || spec[:accept]
-    input_html[:capture] = options[:capture] || spec[:capture] if options[:capture] || spec[:capture]
-    input_html[:multiple] = true if options[:multiple] || spec[:multiple]
-    input_html[:required] = true if spec[:required]
-    input_html[:disabled] = true if spec[:disabled]
-  %>
-  <%= f.file_field name, **input_html %>
-<% end %>
+<%
+  input_html = { class: "file-input file-input-sm w-full #{'file-input-error' if error}" }
+  input_html[:accept] = spec[:accept] if spec[:accept]
+  input_html[:capture] = spec[:capture] if spec[:capture]
+  input_html[:multiple] = true if spec[:multiple]
+  input_html[:required] = true if spec[:required]
+  input_html[:disabled] = true if spec[:disabled]
+%>
+<%= f.file_field name, **input_html %>

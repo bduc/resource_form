@@ -1,7 +1,7 @@
 <fieldset class="fieldset mb-2">
-  <% if options[:label] != false %>
+  <% if spec[:label] != false %>
     <legend class="fieldset-legend">
-      <%= options[:label] || spec[:label] || f.object.class.human_attribute_name(name) %>
+      <%= spec[:label] || f.object.class.human_attribute_name(name) %>
     </legend>
   <% end %>
   <% if spec[:prepend] || spec[:append] %>

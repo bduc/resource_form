@@ -1,9 +1,7 @@
-<%= render "resource_form/daisyui/form/wrapper", f: f, name: name, spec: spec, options: options, error: error do %>
-  <%= f.number_field name,
-        class: "input input-sm w-full #{'input-error' if error} #{'join-item' if spec[:prepend] || spec[:append]}",
-        placeholder: spec[:placeholder],
-        step: spec[:step] || "any",
-        required: spec[:required],
-        readonly: spec[:readonly],
-        disabled: spec[:disabled] %>
-<% end %>
+<%= f.number_field name,
+      class: "input input-sm w-full #{'input-error' if error} #{'join-item' if spec[:prepend] || spec[:append]}",
+      placeholder: spec[:placeholder],
+      step: spec[:step] || "any",
+      required: spec[:required],
+      readonly: spec[:readonly],
+      disabled: spec[:disabled] %>
