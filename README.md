@@ -148,7 +148,7 @@ The helper is resolved after the form body renders, so it works even at the top 
 - `label_method:` — reader used to label the option (select) or the already-selected record (lookups)
 - `required:`, `readonly:`, `disabled:`
 - `partial:` — explicitly pick a custom partial name
-- `show:`, `index:`, `filter:` — namespaced keys reserved for future non-form view modes (registered with `ResourceCore.register_namespace`; ignored by FormBuilder)
+- `show:`, `index:`, `filter:` — conventional names for a future renderer's namespace (a table, a detail page, a search form), meant to be declared with `ResourceCore.register_namespace`. No renderer registers them yet, so today they are unknown options like any other typo and raise — `field :title, show: { … }` fails with `ArgumentError: unknown option(s) [:show]`, it is not silently ignored.
 
 ## Labelling selected lookup records
 
