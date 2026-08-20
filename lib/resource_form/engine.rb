@@ -8,5 +8,9 @@ module ResourceForm
         include ResourceForm::Helpers::FormHelper
       end
     end
+
+    initializer "resource_form.field_types" do
+      ResourceForm.register_field_types!
+    end
   end
 end

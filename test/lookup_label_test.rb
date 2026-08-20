@@ -50,10 +50,10 @@ class LookupLabelTest < ActiveSupport::TestCase
   end
 
   test "the convention chain is configurable" do
-    original = ResourceForm.config.lookup_label_methods
-    ResourceForm.config.lookup_label_methods = %i[caption]
+    original = ResourceCore.config.lookup_label_methods
+    ResourceCore.config.lookup_label_methods = %i[caption]
     assert_equal "Caption", ResourceForm.lookup_label(record(caption: "Caption", name: "Name"))
   ensure
-    ResourceForm.config.lookup_label_methods = original
+    ResourceCore.config.lookup_label_methods = original
   end
 end

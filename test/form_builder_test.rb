@@ -7,49 +7,49 @@ class FormBuilderTest < ActiveSupport::TestCase
   end
 
   test "error_for aggregates errors across a field's consumed attribute names" do
-    fed = Federation.new
-    fed.errors.add(:province, "must exist")
+    book = Book.new
+    book.errors.add(:author, "must exist")
 
-    builder = make_builder(fed)
-    # :province_id FK field should consume errors on :province association
-    consumed = builder.send(:error_attribute_names, :province_id, {})
-    assert_includes consumed, :province
-    assert_includes consumed, :province_id
+    builder = make_builder(book)
+    # :author_id FK field should consume errors on :author association
+    consumed = ResourceCore.consumed_error_names(:author_id, {})
+    assert_includes consumed, :author
+    assert_includes consumed, :author_id
     assert_equal "must exist", builder.send(:error_for, consumed)
   end
 
   test "explicit consume_errors option adds to the default list" do
-    fed = Federation.new
-    fed.errors.add(:province, "A")
-    fed.errors.add(:name, "B")
+    book = Book.new
+    book.errors.add(:author, "A")
+    book.errors.add(:title, "B")
 
-    builder = make_builder(fed)
-    consumed = builder.send(:error_attribute_names, :name, consume_errors: [:province])
-    assert_includes consumed, :name
-    assert_includes consumed, :province
+    builder = make_builder(book)
+    consumed = ResourceCore.consumed_error_names(:title, consume_errors: [ :author ])
+    assert_includes consumed, :title
+    assert_includes consumed, :author
     # to_sentence is locale-dependent ("and" in :en, "en" in :nl), and the host
     # app picks the locale — so assert against it rather than hardcoding English.
     assert_equal [ "B", "A" ].to_sentence, builder.send(:error_for, consumed)
   end
 
   test "password field defaults to consuming password_confirmation errors" do
-    user = User.new
-    user.errors.add(:password_confirmation, "doesn't match")
+    author = Author.new
+    author.errors.add(:password_confirmation, "doesn't match")
 
-    builder = make_builder(user)
-    consumed = builder.send(:error_attribute_names, :password, {})
+    make_builder(author)
+    consumed = ResourceCore.consumed_error_names(:password, {})
     assert_includes consumed, :password_confirmation
   end
 
   test "reported_attrs tracks rendered field names" do
-    fed = Federation.new
-    builder = make_builder(fed)
+    book = Book.new
+    builder = make_builder(book)
     assert_equal Set.new, builder.send(:reported_attrs)
   end
 
   test "unreported_errors returns a placeholder marker" do
-    fed = Federation.new
-    builder = make_builder(fed)
+    book = Book.new
+    builder = make_builder(book)
     marker = builder.unreported_errors
     assert_equal ResourceForm::FormBuilder::UNREPORTED_ERRORS_MARKER, marker
     assert builder.unreported_errors_requested?

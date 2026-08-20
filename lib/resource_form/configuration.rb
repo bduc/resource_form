@@ -1,13 +1,12 @@
 module ResourceForm
   class Configuration
-    attr_accessor :theme, :resource_class_suffix, :lookup_label_methods
+    attr_writer :theme
 
-    def initialize
-      @theme = :daisyui
-      @resource_class_suffix = "Resource"
-      # Readers tried, in order, to label an already-selected lookup record.
-      # A field can override this with `label_method:`.
-      @lookup_label_methods = %i[lookup_label display_name full_name name]
+    # Falls back to the core's theme, so an app that sets one setting gets
+    # consistent behaviour from every renderer, and can still override per
+    # renderer when it needs to.
+    def theme
+      @theme || ResourceCore.config.theme
     end
   end
 end
