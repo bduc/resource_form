@@ -81,4 +81,29 @@ class FormBuilderTest < ActiveSupport::TestCase
     assert_equal ResourceForm::FormBuilder::UNREPORTED_ERRORS_MARKER, marker
     assert builder.unreported_errors_requested?
   end
+
+  # The only other theme assertion in the suite (field_types_test.rb) checks
+  # theme_chain(:daisyui) == [:daisyui] — the single-element case, which
+  # never exercises the fallback a child theme depends on. This registers a
+  # theme with no partials of its own and proves BOTH a field and
+  # render_unreported_errors fall back to the parent's, i.e. that
+  # render_unreported_errors goes through partial_path like every other
+  # partial instead of hardcoding the leaf theme.
+  test "a child theme with no partials of its own still resolves fields and unreported_errors through its parent" do
+    ResourceCore.register_theme :childless, parent: :daisyui
+    original_theme = ResourceForm.config.theme
+    ResourceForm.config.theme = :childless
+
+    book = Book.new(title: "Moby Dick")
+    book.errors.add(:base, "something is wrong")
+
+    builder = make_rendering_builder(book)
+    html = builder.field(:title, as: :text)
+    assert_match(/name="book\[title\]"/, html)
+
+    errors_html = builder.render_unreported_errors
+    assert_includes errors_html, "something is wrong"
+  ensure
+    ResourceForm.config.theme = original_theme
+  end
 end

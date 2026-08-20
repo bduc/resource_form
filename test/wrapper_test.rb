@@ -47,6 +47,13 @@ class WrapperTest < ActionView::TestCase
     assert_includes html, 'rows="9"'
   end
 
+  test "numeric min and max reach the partial" do
+    html = render_field(:pages, as: :numeric, min: 0, max: 5000)
+
+    assert_includes html, 'min="0"'
+    assert_includes html, 'max="5000"'
+  end
+
   test "an unregistered type raises naming the type, not a missing template" do
     error = assert_raises(ArgumentError) { render_field(:title, as: :ritch_text) }
 

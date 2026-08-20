@@ -55,7 +55,7 @@ A field type is a registration plus a partial.
 # config/initializers/resource_form.rb
 ResourceCore.register_field_type :rich_text,
   renderers: [ :form ],
-  options:   %i[toolbar],
+  options:   %i[toolbar rows],
   defaults:  { rows: 6 }
 ```
 

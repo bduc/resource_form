@@ -7,6 +7,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: resource_form
     services:
       postgres:
         image: postgres:16
@@ -21,12 +24,20 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/resource_form_test
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: resource_form
+      # actions/checkout requires `path:` to resolve under $GITHUB_WORKSPACE,
+      # so the engine this gem depends on has to land in its own workspace
+      # subdirectory (../resource_core is one level above and gets rejected)
+      # rather than the sibling-checkout layout the Gemfile's `path:` implies
+      # locally.
       - uses: actions/checkout@v4
         with:
           repository: bduc/resource_core
-          path: ../resource_core
+          path: resource_core
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+          working-directory: resource_form
       - run: bin/rails db:prepare
       - run: bundle exec rake test

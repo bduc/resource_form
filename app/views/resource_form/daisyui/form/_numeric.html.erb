@@ -2,6 +2,8 @@
       class: "input input-sm w-full #{'input-error' if error} #{'join-item' if spec[:prepend] || spec[:append]}",
       placeholder: spec[:placeholder],
       step: spec[:step] || "any",
+      min: spec[:min],
+      max: spec[:max],
       required: spec[:required],
       readonly: spec[:readonly],
       disabled: spec[:disabled] %>

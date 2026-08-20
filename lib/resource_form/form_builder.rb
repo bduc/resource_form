@@ -59,9 +59,8 @@ module ResourceForm
       unreported = object.errors.reject { |err| reported_attrs.include?(err.attribute) }
       return "".html_safe if unreported.empty?
 
-      theme = ResourceForm.config.theme
       @template.render(
-        partial: "resource_form/#{theme}/form/unreported_errors",
+        partial: partial_path("unreported_errors"),
         locals: { errors: unreported }
       )
     end

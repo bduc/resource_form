@@ -34,9 +34,11 @@ module ResourceForm
     # emit a second one.
     ResourceCore.register_field_type :boolean,     renderers: [ :form ], wrapper: false
 
-    # Was FormBuilder#infer_spec. Registered newest-last so the earliest rule
-    # here wins for a name matching more than one — matching the old case
-    # statement's top-to-bottom order.
+    # Was FormBuilder#infer_spec. register_detector unshifts, so whichever of
+    # these runs last is tried first — registered newest-last so the *latest*
+    # rule here wins for a name matching more than one, reproducing the old
+    # case statement's top-to-bottom order (password, _at, _on/date_, email,
+    # tel all win over anything registered earlier in this list).
     ResourceCore.detect { |name, _column| :tel      if name.to_s.match?(/phone|mobile|fax|tel/) }
     ResourceCore.detect { |name, _column| :email    if name.to_s.include?("email") }
     ResourceCore.detect { |name, _column| :date     if name.to_s.match?(/_on\z|\Adate_/) }

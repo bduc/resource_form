@@ -1,7 +1,7 @@
 <%= f.text_area name,
       class: "textarea textarea-sm w-full #{'textarea-error' if error}",
       placeholder: spec[:placeholder],
-      rows: spec[:rows] || 4,
+      rows: spec[:rows],
       required: spec[:required],
       readonly: spec[:readonly],
       disabled: spec[:disabled] %>

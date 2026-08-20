@@ -36,7 +36,7 @@ class FieldTypesTest < ActiveSupport::TestCase
     assert_equal :tel,      ResourceCore::Detection.field_type_for(:mobile, column)
   end
 
-  test "detector precedence: earlier-registered-in-code rules win name collisions" do
+  test "detector precedence: later-registered-in-code rules win name collisions" do
     # Each name below matches two of the five patterns at once, so unlike the
     # five single-match names above, these actually pin the *order* the
     # detectors are tried in (register_detector unshifts, so the last
